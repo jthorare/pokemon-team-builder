@@ -1,21 +1,9 @@
-﻿<h3>Pokemon</h3>
-
+﻿    <div>
+        <img src="{{@PokedexId}.png}">
+    </div>
 @code {
 
     [Parameter]
-    public string PokedexId { get; set; }
+    public int PokedexId { get; set; }
 
-    private string imgSrc { get; set; }
-
-    protected override Task OnInitializedAsync()
-    {
-
-        // TODO filename manipulation to get the correct file and load like this]
-        //https://github.com/richi3f/pokemon-team-planner/blob/master/static/js/main.js
-        //https://docs.microsoft.com/en-us/aspnet/core/blazor/images?view=aspnetcore-6.0
-
-        pokemonFile = "";
-        imgSrc = $"pokemon/";
-        return base.OnInitializedAsync();
-    }
 }
