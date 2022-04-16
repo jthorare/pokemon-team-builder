@@ -21,6 +21,32 @@
     </div>
 }
 
+@if (Region is null)
+{
+    <Figure @onclick=@(() => SetRegion("kalos"))>
+        <FigureImage Source="/game/xy.png" />
+    </Figure>
+
+    <Figure @onclick=@(() => SetRegion("hoenn"))>
+        <FigureImage Source="/game/oras.png" />
+    </Figure>
+
+    <Figure @onclick=@(() => SetRegion("alola"))>
+        <FigureImage Source="/game/sm.png" />
+    </Figure>
+
+    <Figure @onclick=@(() => SetRegion("alola"))>
+        <FigureImage Source="/game/usum.png" />
+    </Figure>
+
+    <Figure @onclick=@(() => SetRegion("kanto"))>
+        <FigureImage Source="/game/lgpe.png" />
+    </Figure>
+
+    <Figure @onclick=@(() => SetRegion("galar"))>
+        <FigureImage Source="/game/swsh.png" />
+    </Figure>
+}
 
 
 @code {
@@ -29,12 +55,14 @@
 
     List<PokemonEntry> PokemonInDex { get; set; }
 
-    private string Region { get; set; } = "kanto";
+    private string Region { get; set; } = null;
 
-    protected override async Task OnInitializedAsync()
+    private async void SetRegion(string region)
     {
+        // TODO fix the api call returning 404 for getting the region's pokedex. Might need to check what the regions
+        // are supposed to be named.
+        Region = region;
         Pokedex pokedex = await pokeApiClient.GetResourceAsync<Pokedex>(Region); // get all kanto pokemon 0-151
         PokemonInDex = pokedex.PokemonEntries; // all entries 0-151 with the correct id to grab
-        await base.OnInitializedAsync();
     }
 }
