@@ -1,9 +1,18 @@
-﻿    <div>
-        <img src="{{@PokedexId}.png}">
-    </div>
+﻿
+  <Figure >
+      <FigureImage Source=@ImgSrc/>
+  </Figure>
 @code {
 
     [Parameter]
     public int PokedexId { get; set; }
+
+    private string? ImgSrc { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        ImgSrc = $"pokemon/{PokedexId}.png";
+        return base.OnInitializedAsync();
+    }
 
 }
