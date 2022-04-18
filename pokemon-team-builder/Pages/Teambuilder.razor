@@ -4,46 +4,56 @@
 
 <h3>Teambuilder</h3>
 
-@if (Region is not null)
+@if (PokemonInDex.Count > 0 && Loaded)
 {
-    <div>
-        <PokemonComponent PokedexId="0" />
-        <PokemonComponent PokedexId="0" />
-        <PokemonComponent PokedexId="0" />
-        <PokemonComponent PokedexId="0" />
-        <PokemonComponent PokedexId="0" />
-        <PokemonComponent PokedexId="0" />
+    <Div>
+        <Button Color="Color.Primary" Clicked=@(() => PokemonInDex.Clear())>
+            Back
+        </Button>
+        <Div>
+            @foreach (int selectedNatDexId in SelectedTeam)
+            {
+                <Button Clicked=@(() => RemoveFromTeam(selectedNatDexId))>
+                    <PokemonComponent PokedexId=@selectedNatDexId />
+                </Button>
+            }
 
-        @foreach (PokemonEntry pokemon in PokemonInDex)
-        {
-            <PokemonComponent PokedexId=pokemon.EntryNumber />
-        }
-    </div>
+
+            @foreach (PokemonEntry pokemon in PokemonInDex)
+            {
+                <Button Clicked=@(() => AddToTeam(GetNatDexId(pokemon.PokemonSpecies.Url)))>
+                    <PokemonComponent PokedexId=@GetNatDexId(pokemon.PokemonSpecies.Url) />
+                </Button>
+
+            }
+        </Div>
+    </Div>
 }
 
-@if (Region is null)
+@if (PokemonInDex.Count == 0)
 {
-    <Figure @onclick=@(() => SetRegion("kalos"))>
+
+    <Figure @onclick=@(async () => await GetPokedex("kalos"))>
         <FigureImage Source="/game/xy.png" />
     </Figure>
 
-    <Figure @onclick=@(() => SetRegion("updated-hoenn"))>
+    <Figure @onclick=@(async () => await GetPokedex("updated-hoenn"))>
         <FigureImage Source="/game/oras.png" />
     </Figure>
 
-    <Figure @onclick=@(() => SetRegion("alola"))>
+    <Figure @onclick=@(async () => await GetPokedex("alola"))>
         <FigureImage Source="/game/sm.png" />
     </Figure>
 
-    <Figure @onclick=@(() => SetRegion("alola"))>
+    <Figure @onclick=@(async () => await GetPokedex("alola"))>
         <FigureImage Source="/game/usum.png" />
     </Figure>
 
-    <Figure @onclick=@(() => SetRegion("kanto"))>
+    <Figure @onclick=@(async () => await GetPokedex("letsgo-kanto"))>
         <FigureImage Source="/game/lgpe.png" />
     </Figure>
 
-    <Figure @onclick=@(() => SetRegion("galar"))>
+    <Figure @onclick=@(async () => await GetPokedex("galar"))>
         <FigureImage Source="/game/swsh.png" />
     </Figure>
 }
@@ -51,18 +61,92 @@
 
 @code {
 
+    bool Loaded = true;
+
     PokeApiClient pokeApiClient = new PokeApiClient();
 
-    List<PokemonEntry> PokemonInDex { get; set; }
+    List<PokemonEntry> PokemonInDex { get; set; } = new List<PokemonEntry>();
 
-    private string Region { get; set; } = null;
+    private List<int> SelectedTeam { get; set; } = new List<int>(6) { 0, 0, 0, 0, 0, 0 };
 
-    private async void SetRegion(string region)
+    /// <summary>
+    /// Adds the given Pokemon from the team.
+    /// </summary>
+    /// <param name="natDexId">Pokemon's NatDexId to add to the team.</param>
+    private void AddToTeam(int natDexId)
     {
-        // TODO kalos is multiple calls, alolan dex is multiple calls, usum updated-alolan dex is multiple calls, galar is multiple calls
-        Region = region;
-        Console.WriteLine(Region);
-        Pokedex pokedex = await pokeApiClient.GetResourceAsync<Pokedex>(Region); // get all kanto pokemon 0-151
-        PokemonInDex = pokedex.PokemonEntries; // all entries 0-151 with the correct id to grab
+        // TODO this needs to get the idx of the id, not the id itself
+        int idxToReplace = SelectedTeam.FirstOrDefault(id => id == 0);
+        Console.WriteLine(idxToReplace);
+        SelectedTeam[idxToReplace] = natDexId;
+        // Updating SelectedTeam is not working
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Removes the given Pokemon from the team.
+    /// </summary>
+    /// <param name="natDexId">Pokemon's NatDexId to remove from the team.</param>
+    private void RemoveFromTeam(int natDexId)
+    {
+        // TODO this needs to get the idx of the id, not the id itself
+        int idxToReplace = SelectedTeam.FirstOrDefault(idx => idx == natDexId);
+        Console.WriteLine(idxToReplace);
+        SelectedTeam[idxToReplace] = 0;
+    }
+
+    private int GetNatDexId(string url)
+    {
+        string[] urlSplit = url.Split("/"); // url is of form "https://pokeapi.co/api/v2/pokemon-species/650/"
+        Console.WriteLine(urlSplit);
+        return Int32.Parse(urlSplit[urlSplit.Length - 2]); // the last # is what we want for our img navigation
+    }
+
+    /// <summary>
+    /// Populates the Pokedex of this page with the given integers.
+    /// </summary>
+    /// <param name="dexes">The Pokedexes we want.</param>
+    /// <returns>Awaits the addition of the api calls</returns>
+    private async Task PopulateDex(List<int> dexes)
+    {
+        foreach (int dexId in dexes)
+        {
+            Pokedex pokedex = await pokeApiClient.GetResourceAsync<Pokedex>(dexId); // get all kanto pokemon 0-151
+            PokemonInDex.AddRange(pokedex.PokemonEntries); // all entries 0-151 with the correct id to grab
+        }
+
+        Loaded = true;
+    }
+
+    /// <summary>
+    /// Gets the Pokedex (or multiple) for the given region.
+    /// </summary>
+    /// <param name="region">The region whose Pokedex we want.</param>
+    /// <returns>Awaits the population of the Pokedex.</returns>
+    private async Task GetPokedex(string region)
+    {
+        Loaded = false;
+        List<int> dexes = HandleSplitRegions(region);
+        await PopulateDex(dexes);
+    }
+
+    /// <summary>
+    /// Returns the list of ids that correspond to the given region in PokeApi's call.
+    /// </summary>
+    /// <param name="reg">The region whose Pokedex we want.</param>
+    /// <returns>The list of ids to use in the PokeApi calls.</returns>
+    private List<int> HandleSplitRegions(string reg)
+    {
+        switch (reg)
+        {
+            case "kalos":
+                return new List<int>() { 12, 13, 14 };
+            case "alola":
+                return new List<int>() { 16, 17, 18, 19, 20 };
+            case "kanto":
+                return new List<int>() { 27, 28, 29 };
+            default:
+                return new List<int>() { 15 };
+        }
     }
 }
