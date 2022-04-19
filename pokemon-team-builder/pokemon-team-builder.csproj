@@ -8,14 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazorise" Version="1.0.2" />
-    <PackageReference Include="Blazorise.Bootstrap" Version="1.0.2" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.3" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.3" />
+    <PackageReference Include="Blazorise" Version="1.0.3" />
+    <PackageReference Include="Blazorise.Bootstrap" Version="1.0.3" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.4" />
     <PackageReference Include="PokeApiNet" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+    <PackageReference Include="Blazorise.Components" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +26,7 @@
   <ItemGroup>
     <None Remove="Microsoft.AspNetCore.Cors" />
     <None Remove="PokemonUtilities\" />
+    <None Remove="Blazorise.Components" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PokemonCommon\" />

@@ -7,6 +7,31 @@
 <h3>Pokedex</h3>
 
 <Div>
+
+    <Blazorise.Components.Autocomplete
+                                       TItem="PokemonEntry"
+                                       TValue="PokemonEntry"
+                                       Data="@PokemonInDex"
+                                       TextField="@((item) => item.PokemonSpecies.Name)"
+                                       ValueField="@((item) => item)"
+                                       Placeholder="Search ..."
+                                       Filter="Blazorise.Components.AutocompleteFilter.StartsWith">
+        <NotFoundContent> Sorry ... @context was not found.</NotFoundContent>
+    </Blazorise.Components.Autocomplete>
+
+    <Blazorise.Components.SelectList TItem="string"
+                                     TValue="string"
+                                     Data="@PokeApiConstants.TypeMappings.Keys.Where(type => type != Type2)"
+                                     SelectedValue=@Type1
+                                     SelectedValueChanged="@FilterDex"
+                                     DefaultItemText="Choose a type"/>
+    <Blazorise.Components.SelectList TItem="string"
+                                     TValue="string"
+                                     Data="@PokeApiConstants.TypeMappings.Keys.Where(type => type != Type1)"
+                                     SelectedValue=@Type2
+                                     SelectedValueChanged="@FilterDex"
+                                     DefaultItemText="Choose a type"/>
+
 </Div>
 <Div>
     @foreach (PokemonEntry pokemon in PokemonInDex)
@@ -16,11 +41,19 @@
 </Div>
 @code {
 
+    private string? Type1 { get; set; } = null;
+    private string? Type2 { get; set; } = null;
+
     List<PokemonEntry> PokemonInDex { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         Pokedex pokedex = await pokeService.GetPokedex("national");
         PokemonInDex = pokedex.PokemonEntries;
+    }
+
+    private void FilterDex(string type)
+    {
+
     }
 }
