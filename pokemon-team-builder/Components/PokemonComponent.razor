@@ -1,18 +1,33 @@
 ﻿
-  <Figure >
-      <FigureImage Source=@ImgSrc/>
-  </Figure>
+<Figure>
+    <FigureImage Source=@ImgSrc />
+</Figure>
 @code {
 
     [Parameter]
-    public int PokedexId { get; set; }
+    public int PokedexId
+    {
+        get { return PokedexId; }
+        set
+        {
+            PokedexId = value;
+            SetImgSrc();
+        }
+    }
 
     private string? ImgSrc { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-        ImgSrc = $"pokemon/{PokedexId}.png";
+        SetImgSrc();
         return base.OnInitializedAsync();
+    }
+
+    private void SetImgSrc()
+    {
+        ImgSrc = $"pokemon/{PokedexId}.png";
+        Console.WriteLine($"poke comp {PokedexId}");
+        StateHasChanged();
     }
 
 }

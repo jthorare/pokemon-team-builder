@@ -32,30 +32,41 @@
 
 @if (PokemonInDex.Count == 0)
 {
+    <Button Clicked=@(async () => await GetPokedex("kalos"))>
+        <Figure>
+            <FigureImage Source="/game/xy.png" />
+        </Figure>
+    </Button>
 
-    <Figure @onclick=@(async () => await GetPokedex("kalos"))>
-        <FigureImage Source="/game/xy.png" />
-    </Figure>
+    <Button Clicked=@(async () => await GetPokedex("updated-hoenn"))>
+        <Figure>
+            <FigureImage Source="/game/oras.png" />
+        </Figure>
+    </Button>
 
-    <Figure @onclick=@(async () => await GetPokedex("updated-hoenn"))>
-        <FigureImage Source="/game/oras.png" />
-    </Figure>
+    <Button Clicked=@(async () => await GetPokedex("alola"))>
+        <Figure>
+            <FigureImage Source="/game/sm.png" />
+        </Figure>
+    </Button>
 
-    <Figure @onclick=@(async () => await GetPokedex("alola"))>
-        <FigureImage Source="/game/sm.png" />
-    </Figure>
+    <Button Clicked=@(async () => await GetPokedex("alola"))>
+        <Figure>
+            <FigureImage Source="/game/usum.png" />
+        </Figure>
+    </Button>
 
-    <Figure @onclick=@(async () => await GetPokedex("alola"))>
-        <FigureImage Source="/game/usum.png" />
-    </Figure>
+    <Button Clicked=@(async () => await GetPokedex("letsgo-kanto"))>
+        <Figure>
+            <FigureImage Source="/game/lgpe.png" />
+        </Figure>
+    </Button>
 
-    <Figure @onclick=@(async () => await GetPokedex("letsgo-kanto"))>
-        <FigureImage Source="/game/lgpe.png" />
-    </Figure>
-
-    <Figure @onclick=@(async () => await GetPokedex("galar"))>
-        <FigureImage Source="/game/swsh.png" />
-    </Figure>
+    <Button Clicked=@(async () => await GetPokedex("galar"))>
+        <Figure>
+            <FigureImage Source="/game/swsh.png" />
+        </Figure>
+    </Button>
 }
 
 
@@ -76,7 +87,9 @@
     private void AddToTeam(int natDexId)
     {
         // TODO this needs to get the idx of the id, not the id itself
-        int idxToReplace = SelectedTeam.FirstOrDefault(id => id == 0);
+        Console.WriteLine($"natidx {natDexId}");
+        int idxToReplace = SelectedTeam.IndexOf(0);
+        if(idxToReplace < 0) { idxToReplace = SelectedTeam.Count - 1; } // IndexOf returns -1 if not found
         Console.WriteLine(idxToReplace);
         SelectedTeam[idxToReplace] = natDexId;
         // Updating SelectedTeam is not working
@@ -90,15 +103,16 @@
     private void RemoveFromTeam(int natDexId)
     {
         // TODO this needs to get the idx of the id, not the id itself
-        int idxToReplace = SelectedTeam.FirstOrDefault(idx => idx == natDexId);
+        int idxToReplace = SelectedTeam.IndexOf(natDexId);
+        Console.WriteLine($"natidx {natDexId}");
         Console.WriteLine(idxToReplace);
         SelectedTeam[idxToReplace] = 0;
+        StateHasChanged();
     }
 
     private int GetNatDexId(string url)
     {
         string[] urlSplit = url.Split("/"); // url is of form "https://pokeapi.co/api/v2/pokemon-species/650/"
-        Console.WriteLine(urlSplit);
         return Int32.Parse(urlSplit[urlSplit.Length - 2]); // the last # is what we want for our img navigation
     }
 
