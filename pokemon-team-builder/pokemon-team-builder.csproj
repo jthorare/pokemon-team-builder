@@ -24,5 +24,9 @@
 
   <ItemGroup>
     <None Remove="Microsoft.AspNetCore.Cors" />
+    <None Remove="PokemonUtilities\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PokemonCommon\" />
   </ItemGroup>
 </Project>

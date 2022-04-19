@@ -1,0 +1,26 @@
+@page "/pokedex"
+@using pokemon_team_builder.Components
+@using pokemon_team_builder.PokemonCommon
+@using pokemon_team_builder.Services
+@inject PokeApiService pokeService
+
+<h3>Pokedex</h3>
+
+<Div>
+</Div>
+<Div>
+    @foreach (PokemonEntry pokemon in PokemonInDex)
+    {
+        <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+    }
+</Div>
+@code {
+
+    List<PokemonEntry> PokemonInDex { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Pokedex pokedex = await pokeService.GetPokedex("national");
+        PokemonInDex = pokedex.PokemonEntries;
+    }
+}

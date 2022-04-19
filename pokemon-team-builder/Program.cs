@@ -4,6 +4,7 @@ using pokemon_team_builder;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
+using pokemon_team_builder.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -21,7 +22,7 @@ builder.Services
     })
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
-
+builder.Services.AddSingleton<PokeApiService>();
 builder.Services.AddOidcAuthentication(options =>
 {
     // Configure your authentication provider options here.

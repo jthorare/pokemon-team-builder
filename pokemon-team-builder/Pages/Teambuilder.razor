@@ -1,31 +1,42 @@
 ﻿@page "/teambuilder"
 @using pokemon_team_builder.Components
-@using PokeApiNet
-
+@using pokemon_team_builder.PokemonCommon
+@using pokemon_team_builder.Services
+@inject PokeApiService pokeService
 <h3>Teambuilder</h3>
 
 @if (PokemonInDex.Count > 0 && Loaded)
 {
     <Div>
-        <Button Color="Color.Primary" Clicked=@(() => PokemonInDex.Clear())>
-            Back
-        </Button>
         <Div>
-            @foreach (int selectedNatDexId in SelectedTeam)
-            {
-                <Button Clicked=@(() => RemoveFromTeam(selectedNatDexId))>
-                    <PokemonComponent PokedexId=@selectedNatDexId />
-                </Button>
-            }
+            <Button Color="Color.Primary" Clicked=@(() => PokemonInDex.Clear())>
+                Back
+            </Button>
 
+            <Button Color="Color.Secondary" Clicked=@(() => SaveTeam())>
+                Save to Profile
+            </Button>
+        </Div>
 
-            @foreach (PokemonEntry pokemon in PokemonInDex)
-            {
-                <Button Clicked=@(() => AddToTeam(GetNatDexId(pokemon.PokemonSpecies.Url)))>
-                    <PokemonComponent PokedexId=@GetNatDexId(pokemon.PokemonSpecies.Url) />
-                </Button>
+        <Div>
 
-            }
+            <Div>
+                @foreach (int selectedNatDexId in SelectedTeam)
+                {
+                    <Button Clicked=@(() => RemoveFromTeam(selectedNatDexId))>
+                        <PokemonComponent PokedexId=@selectedNatDexId />
+                    </Button>
+                }
+            </Div>
+
+            <Div>
+                @foreach (PokemonEntry pokemon in PokemonInDex)
+                {
+                    <Button Clicked=@(() => AddToTeam(PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)))>
+                        <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                    </Button>
+                }
+            </Div>
         </Div>
     </Div>
 }
@@ -74,11 +85,16 @@
 
     bool Loaded = true;
 
-    PokeApiClient pokeApiClient = new PokeApiClient();
-
     List<PokemonEntry> PokemonInDex { get; set; } = new List<PokemonEntry>();
 
     private List<int> SelectedTeam { get; set; } = new List<int>(6) { 0, 0, 0, 0, 0, 0 };
+
+    /// <summary>
+    /// Saves the team to the given user's profile.
+    /// </summary>
+    private void SaveTeam() {
+        // need to inject service and call a save to the backend api
+    }
 
     /// <summary>
     /// Adds the given Pokemon from the team.
@@ -110,12 +126,6 @@
         StateHasChanged();
     }
 
-    private int GetNatDexId(string url)
-    {
-        string[] urlSplit = url.Split("/"); // url is of form "https://pokeapi.co/api/v2/pokemon-species/650/"
-        return Int32.Parse(urlSplit[urlSplit.Length - 2]); // the last # is what we want for our img navigation
-    }
-
     /// <summary>
     /// Populates the Pokedex of this page with the given integers.
     /// </summary>
@@ -125,7 +135,7 @@
     {
         foreach (int dexId in dexes)
         {
-            Pokedex pokedex = await pokeApiClient.GetResourceAsync<Pokedex>(dexId); // get all kanto pokemon 0-151
+            Pokedex pokedex = await pokeService.GetPokedex(dexId); // get all kanto pokemon 0-151
             PokemonInDex.AddRange(pokedex.PokemonEntries); // all entries 0-151 with the correct id to grab
         }
 
@@ -140,27 +150,7 @@
     private async Task GetPokedex(string region)
     {
         Loaded = false;
-        List<int> dexes = HandleSplitRegions(region);
+        List<int> dexes = PokeApiConstants.RegionMappings[region];
         await PopulateDex(dexes);
-    }
-
-    /// <summary>
-    /// Returns the list of ids that correspond to the given region in PokeApi's call.
-    /// </summary>
-    /// <param name="reg">The region whose Pokedex we want.</param>
-    /// <returns>The list of ids to use in the PokeApi calls.</returns>
-    private List<int> HandleSplitRegions(string reg)
-    {
-        switch (reg)
-        {
-            case "kalos":
-                return new List<int>() { 12, 13, 14 };
-            case "alola":
-                return new List<int>() { 16, 17, 18, 19, 20 };
-            case "kanto":
-                return new List<int>() { 27, 28, 29 };
-            default:
-                return new List<int>() { 15 };
-        }
     }
 }

@@ -4,13 +4,14 @@
 </Figure>
 @code {
 
+    private int pokedexId = 0;
     [Parameter]
     public int PokedexId
     {
-        get { return PokedexId; }
+        get { return pokedexId; }
         set
         {
-            PokedexId = value;
+            pokedexId = value;
             SetImgSrc();
         }
     }
