@@ -19,8 +19,15 @@ public class PokeApiService {
         return await Poke.GetResourceAsync<Pokedex>(id);
     }
 
-    public async Task<Type> GetPokemonOfType(string type)
+    public async Task<HashSet<string>> GetPokemonOfType(string type)
     {
-        return await Poke.GetResourceAsync<Type>(type);
+        PokeApiNet.Type typeInfo = await Poke.GetResourceAsync<PokeApiNet.Type>(type);
+        List<TypePokemon> typePokemon = typeInfo.Pokemon;
+        HashSet<string> pokemonOfType = new();
+        foreach(TypePokemon pokemon in typePokemon)
+        {
+            pokemonOfType.Add(pokemon.Pokemon.Name);
+        }
+        return pokemonOfType;
     }
 }
