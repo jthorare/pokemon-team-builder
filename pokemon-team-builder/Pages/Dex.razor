@@ -22,15 +22,15 @@
 
         <Div>
             <Label>Type 1: </Label>
-            <Select TValue="string" SelectedValue="@Type1" SelectedValueChanged="@FilterDexByType">
+            <Select TValue="string" SelectedValue=@Type1 SelectedValueChanged="@FilterDexByType">
                 @foreach (string type in Types.Where(x => x != Type2))
                 {
-                    <SelectItem Value="@type">@type</SelectItem>
+                    <SelectItem @key="@type" Value="@type">@type</SelectItem>
                 }
             </Select>
 
             <Label>Type 2: </Label>
-            <Select TValue="string" SelectedValue="@Type2" SelectedValueChanged="@FilterDexByType">
+            <Select TValue="string" SelectedValue=@Type2 SelectedValueChanged="@FilterDexByType">
                 @foreach (string type in Types.Where(x => x != Type1))
                 {
                     <SelectItem Value="@type">@type</SelectItem>
@@ -86,7 +86,7 @@
     /// </summary>
     /// <param name="type">The type of Pokemon we are looking for.</param>
     private async Task FilterDexByType(string type)
-    {
+    { // TODO Fix the filters showing blank on selection
         Console.WriteLine(type);
         HashSet<string> pokemonOfType = await pokeService.GetPokemonOfType(type); // get the pokemon of that type
         PokemonInDex = PokemonInDex.Where(pokemon => pokemonOfType.Contains(pokemon.PokemonSpecies.Name)).ToList();
