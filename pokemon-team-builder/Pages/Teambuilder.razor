@@ -92,7 +92,8 @@
     /// <summary>
     /// Saves the team to the given user's profile.
     /// </summary>
-    private void SaveTeam() {
+    private void SaveTeam()
+    {
         // need to inject service and call a save to the backend api
     }
 
@@ -105,7 +106,7 @@
         // TODO this needs to get the idx of the id, not the id itself
         Console.WriteLine($"natidx {natDexId}");
         int idxToReplace = SelectedTeam.IndexOf(0);
-        if(idxToReplace < 0) { idxToReplace = SelectedTeam.Count - 1; } // IndexOf returns -1 if not found
+        if (idxToReplace < 0) { idxToReplace = SelectedTeam.Count - 1; } // IndexOf returns -1 if not found
         Console.WriteLine(idxToReplace);
         SelectedTeam[idxToReplace] = natDexId;
         // Updating SelectedTeam is not working
@@ -138,6 +139,7 @@
             Pokedex pokedex = await pokeService.GetPokedex(dexId); // get all kanto pokemon 0-151
             PokemonInDex.AddRange(pokedex.PokemonEntries); // all entries 0-151 with the correct id to grab
         }
+        PokemonInDex = PokemonInDex.DistinctBy(pokemon => pokemon.PokemonSpecies.Name).ToList();
 
         Loaded = true;
     }
