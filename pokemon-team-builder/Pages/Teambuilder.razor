@@ -20,14 +20,14 @@
 
         <Div>
 
-            <div class="fixed-top">
+            <Div>
                 @foreach (int selectedNatDexId in SelectedTeam)
                 {
                     <Button Clicked=@(() => RemoveFromTeam(selectedNatDexId))>
                         <PokemonComponent PokedexId=@selectedNatDexId />
                     </Button>
                 }
-            </div>
+            </Div>
 
             <Div>
                 @foreach (PokemonEntry pokemon in PokemonInDex)
@@ -82,7 +82,6 @@
 
 
 @code {
-    // TODO make SelectedTeam fixed to top as you scroll down page.
     bool Loaded = true;
 
     List<PokemonEntry> PokemonInDex { get; set; } = new List<PokemonEntry>();
