@@ -1,7 +1,8 @@
-﻿using PokeApiNet;
+using PokeApiNet;
 namespace pokemon_team_builder.Services;
 
-public class PokeApiService {
+public class PokeApiService
+{
     private PokeApiClient Poke { get; set; }
 
     public PokeApiService()
@@ -24,10 +25,15 @@ public class PokeApiService {
         PokeApiNet.Type typeInfo = await Poke.GetResourceAsync<PokeApiNet.Type>(type);
         List<TypePokemon> typePokemon = typeInfo.Pokemon;
         HashSet<string> pokemonOfType = new();
-        foreach(TypePokemon pokemon in typePokemon)
+        foreach (TypePokemon pokemon in typePokemon)
         {
             pokemonOfType.Add(pokemon.Pokemon.Name);
         }
         return pokemonOfType;
+    }
+
+    public async Task<PokeApiNet.NamedApiResourceList<PokeApiNet.Type>> GetAllTypes()
+    {
+        return await Poke.GetNamedResourcePageAsync<PokeApiNet.Type>();
     }
 }
