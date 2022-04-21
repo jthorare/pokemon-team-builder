@@ -22,22 +22,9 @@
 
         <Div>
             <Label>Type 1: </Label>
-            <Select TValue="string" SelectedValue=@Type1 SelectedValueChanged=@FilterDexByType>
-                <SelectItem @key="@String.Empty" Value="@String.Empty"></SelectItem>
-                @foreach (string type in Types1)
-                {
-                    <SelectItem @key="@type" Value="@type">@type</SelectItem>
-                }
-            </Select>
-
+            <RadzenDropDown AllowClear="true" AllowFiltering="true" TValue="string" Data="@Types1" SelectedItem="@Type1" Change=@(args => FilterDexByType(Type1))></RadzenDropDown>
             <Label>Type 2: </Label>
-            <Select TValue="string" SelectedValue=@Type2 SelectedValueChanged=@FilterDexByType>
-                <SelectItem @key="@String.Empty" Value="@String.Empty"></SelectItem>
-                @foreach (string type in Types2)
-                {
-                    <SelectItem Value="@type">@type</SelectItem>
-                }
-            </Select>
+            <RadzenDropDown AllowClear="true" AllowFiltering="true" TValue="string" Data="@Types1" SelectedItem="@Type1" Change=@(args => FilterDexByType(Type1))></RadzenDropDown>
         </Div>
     </Div>
 </Div>
@@ -50,7 +37,7 @@
 </Div>
 
 @code {
-
+    // TODO rewrite the image drawing using a Datagrid
     private string? Type1 { get; set; }
     private string? Type2 { get; set; }
     private IEnumerable<string> Types { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
@@ -91,7 +78,7 @@
     /// </summary>
     /// <param name="type">The type of Pokemon we are looking for.</param>
     private async Task FilterDexByType(string? type)
-    { // TODO Fix the filters showing blank on selection
+    {
         Console.WriteLine(type);
         if (type is not null)
         {
@@ -100,5 +87,6 @@
             Types1 = Types.Where(type => type != Type2);
             Types2 = Types.Where(type => type != Type1);
         }
+        StateHasChanged();
     }
 }

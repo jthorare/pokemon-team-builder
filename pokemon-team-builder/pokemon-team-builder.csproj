@@ -17,6 +17,7 @@
     <PackageReference Include="PokeApiNet" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Blazorise.Components" Version="1.0.3" />
+    <PackageReference Include="Radzen.Blazor" Version="3.18.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,7 @@
     <None Remove="Microsoft.AspNetCore.Cors" />
     <None Remove="PokemonUtilities\" />
     <None Remove="Blazorise.Components" />
+    <None Remove="Radzen.Blazor" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PokemonCommon\" />
