@@ -22,16 +22,18 @@
 
         <Div>
             <Label>Type 1: </Label>
-            <Select TValue="string" SelectedValue=@Type1 SelectedValueChanged="@FilterDexByType">
-                @foreach (string type in Types.Where(x => x != Type2))
+            <Select TValue="string" SelectedValue=@Type1 SelectedValueChanged=@FilterDexByType>
+                <SelectItem @key="@String.Empty" Value="@String.Empty"></SelectItem>
+                @foreach (string type in Types1)
                 {
                     <SelectItem @key="@type" Value="@type">@type</SelectItem>
                 }
             </Select>
 
             <Label>Type 2: </Label>
-            <Select TValue="string" SelectedValue=@Type2 SelectedValueChanged="@FilterDexByType">
-                @foreach (string type in Types.Where(x => x != Type1))
+            <Select TValue="string" SelectedValue=@Type2 SelectedValueChanged=@FilterDexByType>
+                <SelectItem @key="@String.Empty" Value="@String.Empty"></SelectItem>
+                @foreach (string type in Types2)
                 {
                     <SelectItem Value="@type">@type</SelectItem>
                 }
@@ -46,11 +48,14 @@
         <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
     }
 </Div>
+
 @code {
 
-    private string? Type1 { get; set; } = "";
-    private string? Type2 { get; set; } = "";
-    private List<string> Types { get; } = PokeApiConstants.TypeMappings.Keys.ToList();
+    private string? Type1 { get; set; }
+    private string? Type2 { get; set; }
+    private IEnumerable<string> Types { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
+    private IEnumerable<string> Types1 { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
+    private IEnumerable<string> Types2 { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
 
     List<PokemonEntry> PokemonInDex { get; set; } = new();
     List<PokemonEntry> NationalDex { get; set; } = new();
@@ -85,11 +90,15 @@
     /// Filters PokemonInDix by type.
     /// </summary>
     /// <param name="type">The type of Pokemon we are looking for.</param>
-    private async Task FilterDexByType(string type)
+    private async Task FilterDexByType(string? type)
     { // TODO Fix the filters showing blank on selection
         Console.WriteLine(type);
-        HashSet<string> pokemonOfType = await pokeService.GetPokemonOfType(type); // get the pokemon of that type
-        PokemonInDex = PokemonInDex.Where(pokemon => pokemonOfType.Contains(pokemon.PokemonSpecies.Name)).ToList();
-        StateHasChanged();
+        if (type is not null)
+        {
+            HashSet<string> pokemonOfType = await pokeService.GetPokemonOfType(type); // get the pokemon of that type
+            PokemonInDex = PokemonInDex.Where(pokemon => pokemonOfType.Contains(pokemon.PokemonSpecies.Name)).ToList();
+            Types1 = Types.Where(type => type != Type2);
+            Types2 = Types.Where(type => type != Type1);
+        }
     }
 }
