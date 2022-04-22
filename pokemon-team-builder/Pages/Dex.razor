@@ -3,21 +3,22 @@
 @using pokemon_team_builder.PokemonCommon
 @using pokemon_team_builder.Services
 @inject PokeApiService pokeService
+@inject NavigationManager UriHelper
 
 <h3>Pokedex</h3>
 
 <Div>
-    <Blazorise.Components.Autocomplete TItem="PokemonEntry" TValue="PokemonEntry" Data="@PokemonInDex"
+    <Blazorise.Components.Autocomplete Class="mb-2" TItem="PokemonEntry" TValue="PokemonEntry" Data="@PokemonInDex"
                                        TextField="@((item) => item.PokemonSpecies.Name)" ValueField="@((item) => item)" Placeholder="Search ..."
-                                       Filter="Blazorise.Components.AutocompleteFilter.StartsWith">
+                                       Filter="Blazorise.Components.AutocompleteFilter.StartsWith"
+                                       SearchChanged=@SearchForMatchingPokemon>
         <NotFoundContent> Sorry ... @context was not found.</NotFoundContent>
     </Blazorise.Components.Autocomplete>
 
     <Div>
-        <Button Color="Color.Primary" Clicked="@ClearFilters">Clear Filters</Button>
 
         <Div>
-            <Label>Type 1: </Label>
+            <Label Class="me-1 label-shift-up">Type 1: </Label>
             <RadzenDropDown TValue="string" Data=@Types1 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, false)) />
             <Label>Type 2: </Label>
             <RadzenDropDown TValue="string" Data=@Types2 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, true)) />
@@ -28,12 +29,13 @@
 <Div>
     @foreach (PokemonEntry pokemon in PokemonInDex)
     {
-        <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+        <Button Clicked=@(() => NavigateToPokemon(pokemon))>
+            <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+        </Button>
     }
 </Div>
 
 @code {
-    // TODO rewrite the image drawing using a Datagrid
     private string Type1 { get; set; } = "";
     private string Type2 { get; set; } = "";
     private IEnumerable<string> Types { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
@@ -55,19 +57,33 @@
     }
 
     /// <summary>
-    /// Removes the filters from the displayed dex.
+    /// Navigates to the page for the selected pokemon.
     /// </summary>
-    private void ClearFilters()
+    /// <param name="pokemon">The pokemon we want to see the page for.</param>
+    private void NavigateToPokemon(PokemonEntry pokemon)
     {
-        Type1 = "";
-        Type2 = "";
-        PokemonInDex.Clear();
-        PokemonInDex.AddRange(NationalDex);
-        Console.WriteLine($"PokemonInDex count {PokemonInDex.Count}");
-        Console.WriteLine($"NationalDex count {NationalDex.Count}");
-        StateHasChanged();
+        UriHelper.NavigateTo($"pokemon?pokemon={pokemon.PokemonSpecies.Name}");
     }
 
+
+    /// <summary>
+    /// Searches for all pokemon whose names start with the given string.
+    /// </summary>
+    /// <param name="args">The pokemon's name as an object.</param>
+    private void SearchForMatchingPokemon(object args)
+    {
+        if (args is not null)
+        {
+            string name = (string)args;
+            PokemonInDex = NationalDex.Where(pokemon => pokemon.PokemonSpecies.Name.Contains(name)).ToList();
+        }
+    }
+
+    /// <summary>
+    /// Sets the corresponding Type# property.
+    /// </summary>
+    /// <param name="type">The string to set the Type# to.</param>
+    /// <param name="two">Are we changing the Type2 property.</param>
     private void ChangeType(string type, bool two)
     {
         if (!two)
@@ -106,6 +122,10 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Filters the National Dex by the Type1 and Type2 properties.
+    /// </summary>
+    /// <returns>The pokemon of the correct types.</returns>
     private async Task<List<PokemonEntry>> FilterDex()
     {
         HashSet<string> pokemonOfType1;

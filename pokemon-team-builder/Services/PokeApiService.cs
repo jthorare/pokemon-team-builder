@@ -32,6 +32,11 @@ public class PokeApiService
         return pokemonOfType;
     }
 
+    public async Task<Pokemon> GetPokemon(string name)
+    {
+        return await Poke.GetResourceAsync<Pokemon>(name);
+    }
+
     public async Task<PokeApiNet.NamedApiResourceList<PokeApiNet.Type>> GetAllTypes()
     {
         return await Poke.GetNamedResourcePageAsync<PokeApiNet.Type>();
