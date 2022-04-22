@@ -1,0 +1,29 @@
+@using PokemonTeamBuilder.Client.Services
+@inject PokeApiService pokeService
+
+<Figure>
+    <FigureImage Source=@ImgSrc />
+</Figure>
+@code {
+    private int pokedexId = 0;
+
+    [Parameter, EditorRequired]
+    public int NatDexId { get; set; }
+
+    private string? ImgSrc { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        SetImgSrc();
+        return base.OnInitializedAsync();
+    }
+
+    private async void SetImgSrc()
+    {
+        ImgSrc = $"pokemon/{NatDexId}.png";
+        //var pokemon = await pokeService.GetPokemon(NatDexId.ToString());
+        //ImgSrc = pokemon.Sprites.FrontDefault;
+        StateHasChanged();
+    }
+
+}

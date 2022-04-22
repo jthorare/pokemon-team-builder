@@ -1,0 +1,37 @@
+﻿@page "/pokemon"
+@inject NavigationManager NavManager
+@inject PokeApiService pokeService
+<h3> @PokemonName</h3>
+
+@if (Pokemon is not null)
+{
+    <Div>
+        <Label>#@NatDexId</Label>
+        <PokemonComponent NatDexId=@NatDexId />
+    </Div>
+}
+
+@code {
+    string? PokemonName { get; set; }
+    Pokemon? Pokemon { get; set; }
+    int NatDexId { get; set; }
+
+    /// <summary>
+    /// Sets the name and makes the api call to get the given Pokemon's info.
+    /// </summary>
+    /// <returns>Asynchronous load of a task.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("pokemon", out var _name))
+        {
+            PokemonName = _name;
+        }
+        if (PokemonName is not null)
+        {
+            Pokemon = await pokeService.GetPokemon(PokemonName);
+            NatDexId = PokemonUtilities.GetNatDexId(Pokemon.Species.Url);
+        }
+
+    }
+}

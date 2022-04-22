@@ -30,7 +30,7 @@
     @foreach (PokemonEntry pokemon in PokemonInDex)
     {
         <Button Clicked=@(() => NavigateToPokemon(pokemon))>
-            <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+            <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)/>
         </Button>
     }
 </Div>
@@ -62,7 +62,7 @@
     /// <param name="pokemon">The pokemon we want to see the page for.</param>
     private void NavigateToPokemon(PokemonEntry pokemon)
     {
-        UriHelper.NavigateTo($"pokemon?pokemon={pokemon.PokemonSpecies.Name}");
+        UriHelper.NavigateTo($"pokemon?pokemon={PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)}");
     }
 
 

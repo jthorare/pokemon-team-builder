@@ -1,0 +1,51 @@
+﻿@using Blazorise
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<Bar Class="navbar" Breakpoint="Breakpoint.Widescreen"
+     Background="Background.Dark"
+     ThemeContrast="ThemeContrast.Dark" Width="Width.Is100">
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="/home">Home</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/pokedex">Search Pokedex</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/teambuilder">Teambuilder</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/profile">Profile</BarLink>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <AuthorizeView>
+                    <Authorized>
+                        @context.User.Identity?.Name!
+                        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="authentication/login">Log in</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+
+
+
+@code {
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

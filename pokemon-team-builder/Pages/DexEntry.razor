@@ -6,10 +6,13 @@
 @inject PokeApiService pokeService
 <h3> @PokemonName</h3>
 
-<Div>
-    <Label>#@NatDexId</Label>
-    <PokemonComponent PokedexId=NatDexId />
-</Div>
+@if (Pokemon is not null)
+{
+    <Div>
+        <Label>#@NatDexId</Label>
+        <PokemonComponent NatDexId=@NatDexId />
+    </Div>
+}
 
 @code {
     string? PokemonName { get; set; }

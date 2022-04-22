@@ -1,0 +1,45 @@
+﻿@using Blazorise
+
+<CascadingAuthenticationState>
+    <Blazorise.ThemeProvider Theme="@theme">
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                        @if (context.User.Identity?.IsAuthenticated != true)
+                        {
+                            <RedirectToLogin />
+                        }
+                        else
+                        {
+                            <p role="alert">You are not authorized to access this resource.</p>
+                        }
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </Blazorise.ThemeProvider>
+</CascadingAuthenticationState>
+
+@code {
+    private Theme theme = new Theme
+        {
+            ColorOptions = new ThemeColorOptions
+            {
+                Primary = "#b181d4",
+                Secondary = "#4bc9c1"
+            },
+            BackgroundOptions = new ThemeBackgroundOptions
+            {
+                Primary = "#252729",
+                Secondary = "##44474a"
+            }
+        };
+}

@@ -2,7 +2,7 @@
 namespace pokemon_team_builder.PokemonCommon;
 public static class PokeApiConstants
 {
-    public static Dictionary<string, List<int>> RegionMappings = new()
+    public static readonly Dictionary<string, List<int>> RegionMappings = new()
     {
         { "alola", new List<int>() { 16, 17, 18, 19, 20 } },
         { "kalos", new List<int>() { 12, 13, 14 } },
@@ -11,7 +11,7 @@ public static class PokeApiConstants
         { "letsgo-kanto", new List<int> { 26 } }
     };
 
-    public static Dictionary<string, int> TypeMappings = new()
+    public static readonly Dictionary<string, int> TypeMappings = new()
     {
         { "normal", 0 },
         { "fighting", 1 },

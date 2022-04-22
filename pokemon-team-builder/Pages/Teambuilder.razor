@@ -24,7 +24,7 @@
                 @foreach (int selectedNatDexId in SelectedTeam)
                 {
                     <Button Clicked=@(() => RemoveFromTeam(selectedNatDexId))>
-                        <PokemonComponent PokedexId=@selectedNatDexId />
+                        <PokemonComponent NatDexId=@selectedNatDexId />
                     </Button>
                 }
             </Div>
@@ -33,7 +33,7 @@
                 @foreach (PokemonEntry pokemon in PokemonInDex)
                 {
                     <Button Clicked=@(() => AddToTeam(PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)))>
-                        <PokemonComponent PokedexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                        <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
                     </Button>
                 }
             </Div>

@@ -12,7 +12,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddCors(options => options.AddDefaultPolicy(builder =>
-                builder.WithOrigins("https://pokeapi.co/api/v2")
+                builder.WithOrigins("https://pokeapi.co/api/v2", 
+                                    "https://raw.githubusercontent.com/PokeAPI/sprites/")
                        .AllowAnyMethod()
                        .AllowAnyHeader()));
 builder.Services
