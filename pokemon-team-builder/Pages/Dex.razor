@@ -18,9 +18,9 @@
 
         <Div>
             <Label>Type 1: </Label>
-            <RadzenDropDown TValue="string" Data=@Types1 SelectedItemsText=@Type2 Change=@(async (args) => await FilterDexByType(args, false)) />
+            <RadzenDropDown TValue="string" Data=@Types1 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, false)) />
             <Label>Type 2: </Label>
-            <RadzenDropDown TValue="string" Data=@Types2 SelectedItemsText=@Type2 Change=@(async (args) => await FilterDexByType(args, true)) />
+            <RadzenDropDown TValue="string" Data=@Types2 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, true)) />
         </Div>
     </Div>
 </Div>
@@ -65,39 +65,69 @@
         PokemonInDex.AddRange(NationalDex);
         Console.WriteLine($"PokemonInDex count {PokemonInDex.Count}");
         Console.WriteLine($"NationalDex count {NationalDex.Count}");
+        StateHasChanged();
     }
 
-
+    private void ChangeType(string type, bool two)
+    {
+        if (!two)
+        {
+            Type1 = type;
+        }
+        if (two)
+        {
+            Type2 = type;
+        }
+    }
 
     /// <summary>
-    /// Filters PokemonInDex by type.
+    /// Event handler for the Type Filters.
     /// </summary>
-    /// <param name="type">The type of Pokemon we are looking for.</param>
-    private async Task FilterDexByType(object args, bool two)
+    /// <param name="args">The type (string) as an object.</param>
+    /// <param name="two">Is this firing because it is for Type2?</param>
+    /// <returns>Task for async purposes.</returns>
+    private async Task TypeFilterChanged(object args, bool two)
     {
-        Console.WriteLine((string)args, two);
-
-        Console.WriteLine(Type1, Type2);
-
         if (args is not null)
         {
             string type = (string)args;
-            if (!two)
-            {
-                Type1 = type;
-            }
-            if(two)
-            {
-                Type2 = type;
-            }
-            //HashSet<string> pokemonOfType1 = await pokeService.GetPokemonOfType(Type1); // get the pokemon of that type
-            //HashSet<string> pokemonOfType2 = await pokeService.GetPokemonOfType(Type2); // get the pokemon of that type
-            //HashSet<string> pokemonOfBothTypes = pokemonOfType1.Where(pokemon => pokemonOfType2.Contains(pokemon)).ToHashSet();
-            HashSet<string> pokemonOfType = await pokeService.GetPokemonOfType(type); // get the pokemon of that type
-            PokemonInDex = PokemonInDex.Where(pokemon => pokemonOfType.Contains(pokemon.PokemonSpecies.Name)).ToList();
-            Types1 = Types.Where(type => type != Type2);
-            Types2 = Types.Where(type => type != Type1);
+            ChangeType(type, two);
         }
+        if (args is null) // this event gets fired by clearing the dropdowns
+        {
+            ChangeType("", two);
+        }
+
+        //  get the Type that isn't null, refilter
+        PokemonInDex = await FilterDex();
+        Types1 = Types.Where(type => type != Type2);
+        Types2 = Types.Where(type => type != Type1);
+
         StateHasChanged();
+    }
+
+    private async Task<List<PokemonEntry>> FilterDex()
+    {
+        HashSet<string> pokemonOfType1;
+        HashSet<string> pokemonOfType2;
+        if (String.IsNullOrEmpty(Type1)) // if there is no filter, default to all pokemon
+        {
+            pokemonOfType1 = NationalDex.Select(x => x.PokemonSpecies.Name).ToHashSet();
+        }
+        else
+        {
+            pokemonOfType1 = await pokeService.GetPokemonOfType(Type1); // get the pokemon of that type
+        }
+        if (String.IsNullOrEmpty(Type2)) // if there is no filter, default to all pokemon
+
+        {
+            pokemonOfType2 = NationalDex.Select(x => x.PokemonSpecies.Name).ToHashSet();
+        }
+        else
+        {
+            pokemonOfType2 = await pokeService.GetPokemonOfType(Type2); // get the pokemon of that type
+        }
+        HashSet<string> pokemonOfBothTypes = pokemonOfType1.Where(pokemon => pokemonOfType2.Contains(pokemon)).ToHashSet();
+        return NationalDex.Where(pokemon => pokemonOfBothTypes.Contains(pokemon.PokemonSpecies.Name)).ToList();
     }
 }
