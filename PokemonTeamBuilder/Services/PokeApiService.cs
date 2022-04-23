@@ -1,5 +1,5 @@
 using PokeApiNet;
-namespace PokemonTeamBuilder.Client.Services;
+namespace PokemonTeamBuilder.Services;
 
 public class PokeApiService
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace PokemonTeamBuilder.Client.PokemonCommon;
+namespace PokemonTeamBuilder.PokemonCommon;
 
 public static class PokemonUtilities
 {

@@ -10,8 +10,8 @@
             <Div>
                 <Label Class="top-50">Type 2: </Label>
             </Div>
-            <RadzenDropDown TValue="string" Data=@Types2 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" 
-            SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, true)) />
+            <RadzenDropDown TValue="string" Data=@Types2 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true"
+                            SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, true)) />
         </Div>
         <Div Class="float-end">
             <Div>
@@ -23,15 +23,15 @@
 </Div>
 <Div Class="float-end">
     <RadzenDataGrid @ref="grid" Data=@PokemonInDex TItem="PokemonEntry" FilterMode="FilterMode.Simple" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
-    RowSelect=@NavigateToPokemon Count=@count> 
+                    RowSelect=@NavigateToPokemon Count=@count>
         <Columns>
             <RadzenDataGridColumn TItem="PokemonEntry" Property="EntryNumber"
                                   Sortable="true" Filterable="true" Title="ID" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="PokemonEntry" Prope Class="d-flex justify-content-between" rty="PokemonSpecies.Name"
+            <RadzenDataGridColumn TItem="PokemonEntry" Property="PokemonSpecies.Name"
                                   Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
                 <Template Context="pokemon">
-                        <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                    <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
                 </Template>
             </RadzenDataGridColumn>
         </Columns>
@@ -79,8 +79,13 @@
     {
         if (args is not null)
         {
+            PokemonInDex = new List<PokemonEntry>();
+            StateHasChanged();
+            count = 0;
             string name = (string)args;
             PokemonInDex = NationalDex.Where(pokemon => pokemon.PokemonSpecies.Name.Contains(name)).ToList();
+            count = PokemonInDex.Count();
+            StateHasChanged();
         }
     }
 

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
-using PokemonTeamBuilder.Client;
-using PokemonTeamBuilder.Client.Services;
+using PokemonTeamBuilder.Services;
+using PokemonTeamBuilder;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -18,7 +18,14 @@ builder.Services
     })
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
-builder.Services.AddSingleton<PokeApiService>();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+                      policy =>
+                      {
+                          policy.WithOrigins("https://pokeapi.co/api/v2");
+                      });
+}); builder.Services.AddSingleton<PokeApiService>();
 builder.Services.AddOidcAuthentication(options =>
 {
     // Configure your authentication provider options here.
