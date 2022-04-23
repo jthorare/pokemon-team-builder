@@ -1,6 +1,9 @@
 using PokeApiNet;
 namespace PokemonTeamBuilder.Services;
 
+/// <summary>
+/// This class exists to wrap the PokeApiClient. The PokeApiClient extends HttpClient and therefore cannot be instantiated as a Singleton.
+/// </summary>
 public class PokeApiService
 {
     private PokeApiClient Poke { get; set; }
@@ -23,12 +26,7 @@ public class PokeApiService
     public async Task<HashSet<string>> GetPokemonOfType(string type)
     {
         PokeApiNet.Type typeInfo = await Poke.GetResourceAsync<PokeApiNet.Type>(type);
-        List<TypePokemon> typePokemon = typeInfo.Pokemon;
-        HashSet<string> pokemonOfType = new();
-        foreach (TypePokemon pokemon in typePokemon)
-        {
-            pokemonOfType.Add(pokemon.Pokemon.Name);
-        }
+        HashSet<string> pokemonOfType = typeInfo.Pokemon.Select(pokemon => pokemon.Pokemon.Name).ToHashSet();
         return pokemonOfType;
     }
 
@@ -40,5 +38,15 @@ public class PokeApiService
     public async Task<PokeApiNet.NamedApiResourceList<PokeApiNet.Type>> GetAllTypes()
     {
         return await Poke.GetNamedResourcePageAsync<PokeApiNet.Type>();
+    }
+
+    public async Task<Ability> GetAbility(string ability)
+    {
+        return await Poke.GetResourceAsync<Ability>(ability);
+    }
+
+    public async Task<Move> GetMove(string move)
+    {
+        return await Poke.GetResourceAsync<Move>(move);
     }
 }

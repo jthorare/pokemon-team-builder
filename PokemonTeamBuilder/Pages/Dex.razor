@@ -23,7 +23,7 @@
 </Div>
 <Div Class="float-end">
     <RadzenDataGrid @ref="grid" Data=@PokemonInDex TItem="PokemonEntry" FilterMode="FilterMode.Simple" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
-                    RowSelect=@NavigateToPokemon Count=@count>
+                    RowSelect=@NavigateToPokemon Count=@count Filter=@FilterDex>
         <Columns>
             <RadzenDataGridColumn TItem="PokemonEntry" Property="EntryNumber"
                                   Sortable="true" Filterable="true" Title="ID" TextAlign="TextAlign.Center" />
@@ -31,7 +31,7 @@
                                   Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
                 <Template Context="pokemon">
-                    <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                    <PokemonComponent NatDexId=@pokemon.EntryNumber />
                 </Template>
             </RadzenDataGridColumn>
         </Columns>
@@ -68,22 +68,21 @@
     /// <param name="pokemon">The pokemon we want to see the page for.</param>
     private void NavigateToPokemon(PokemonEntry pokemon)
     {
-        UriHelper.NavigateTo($"pokemon?pokemon={PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)}");
+        UriHelper.NavigateTo($"pokemon?pokemon={PokemonUtilities.GetResourceFromUrl(pokemon.PokemonSpecies.Url)}");
     }
 
     /// <summary>
     /// Searches for all pokemon whose names start with the given string.
     /// </summary>
     /// <param name="args">The pokemon's name as an object.</param>
-    private void SearchForMatchingPokemon(object args)
+    private void FilterDex(object args)
     {
+        Console.WriteLine(args.ToString());
         if (args is not null)
         {
             PokemonInDex = new List<PokemonEntry>();
             StateHasChanged();
             count = 0;
-            string name = (string)args;
-            PokemonInDex = NationalDex.Where(pokemon => pokemon.PokemonSpecies.Name.Contains(name)).ToList();
             count = PokemonInDex.Count();
             StateHasChanged();
         }

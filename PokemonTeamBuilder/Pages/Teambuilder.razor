@@ -35,7 +35,7 @@
                                       Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
                     <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
                         <Template Context="pokemon">
-                            <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                            <PokemonComponent NatDexId=@Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.PokemonSpecies.Url))/>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -105,7 +105,7 @@
     /// <param name="natDexId">Pokemon's NatDexId to add to the team.</param>
     private void AddToTeam(PokemonEntry pokemon)
     {
-        int natDexId = PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url);
+        int natDexId = Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.PokemonSpecies.Url)); // we use the utility because pokemon.EntryNumber is the local dex and imgs are by nat dex
         Console.WriteLine($"natidx {natDexId}");
         int idxToReplace = SelectedTeam.IndexOf(0);
         if (idxToReplace < 0) { idxToReplace = SelectedTeam.Count - 1; } // IndexOf returns -1 if not found

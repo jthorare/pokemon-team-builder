@@ -1,13 +1,24 @@
 ﻿@page "/pokemon"
 @inject NavigationManager NavManager
 @inject PokeApiService pokeService
-<h3> @PokemonName</h3>
 
 @if (Pokemon is not null)
 {
     <Div>
-        <Label>#@NatDexId</Label>
-        <PokemonComponent NatDexId=@NatDexId />
+        <Div Class="flex justify-content-end">
+            <h3>#@NatDexId</h3>
+            <PokemonComponent NatDexId=@NatDexId />
+        </Div>
+        <Div Class="d-flex justify-content-between">
+            <Div>@PokemonName</Div>
+            <Div>
+                @foreach (var ability in Pokemon.Abilities)
+                {
+                    <AbilityComponent Url=@ability.Ability.Url IsHidden=@ability.IsHidden></AbilityComponent>
+                }
+            </Div>
+        </Div>
+        <PokemonMovesComponent Pokemon=@Pokemon/>  
     </Div>
 }
 
@@ -30,7 +41,7 @@
         if (PokemonName is not null)
         {
             Pokemon = await pokeService.GetPokemon(PokemonName);
-            NatDexId = PokemonUtilities.GetNatDexId(Pokemon.Species.Url);
+            NatDexId = Pokemon.Id;
         }
 
     }

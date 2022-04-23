@@ -1,0 +1,78 @@
+﻿@inject PokeApiService pokeService
+
+@if (Pokemon is not null)
+{
+    <MoveTableComponent Title="Level Up Moves" Moves=@LvlUpMoves MoveMappings=@MoveMappings />
+<br />
+    <MoveTableComponent Title="Other Moves" Moves=@OtherMoves MoveMappings=@MoveMappings />
+
+}
+@code {
+    [Parameter, EditorRequired]
+    public Pokemon? Pokemon { get; set; }
+
+    private IEnumerable<PokemonMove> PokemonMoves { get; set; } = new List<PokemonMove>(); // unsure if we need the pokemonmoves. Need lvl its learned which is in PokemonMove
+    private IEnumerable<Move> Moves { get; set; } = new List<Move>();
+    private Dictionary<Move, PokemonMove> MoveMappings { get; set; } = new();
+    private Dictionary<PokemonMove, Move> PokemonMoveMappings { get; set; } = new();
+    private IEnumerable<Move> LvlUpMoves { get; set; } = new List<Move>(); // all moves learned by lvl up
+    private IEnumerable<Move> OtherMoves { get; set; } = new List<Move>(); // should be all the other moves
+    protected async override Task OnInitializedAsync()
+    {
+        var pokemonMoves = Pokemon.Moves;
+        var moves = await GetMoves(Pokemon.Moves);
+        (MoveMappings, PokemonMoveMappings) = MapMoves(pokemonMoves.OrderBy(pMove => pMove.Move.Name), moves.OrderBy(move => move.Name));
+        moves = moves.OrderBy(move => GetLevelLearned(move)); // get the pokemon move that corresponds to this move so I have the lvl info
+        (LvlUpMoves, OtherMoves) = SpliceMovesByLearnMethod(moves);
+    }
+
+    private string GetLevelLearned(Move move)
+    {
+        int lvlLearned = 0;
+        var details = MoveMappings[move].VersionGroupDetails.LastOrDefault();
+        if (details is not null) { lvlLearned = details.LevelLearnedAt; }
+        if (lvlLearned <= 1)
+        {
+            return "-";
+        }
+        return lvlLearned.ToString();
+    }
+
+    private ValueTuple<IEnumerable<Move>, IEnumerable<Move>> SpliceMovesByLearnMethod(IEnumerable<Move> moves)
+    {
+        List<Move> lvlUpMoves = new();
+        List<Move> otherMoves = new();
+        foreach (Move move in moves)
+        {
+            var pokemonMove = MoveMappings[move].VersionGroupDetails.LastOrDefault();
+            if (pokemonMove is not null && pokemonMove.MoveLearnMethod.Name == PokeApiConstants.MoveLearnMethod.LvlUp)
+            {
+                lvlUpMoves.Add(move);
+            }
+            else
+            {
+                otherMoves.Add(move);
+            }
+        }
+        return (lvlUpMoves, otherMoves);
+    }
+
+    private ValueTuple<Dictionary<Move, PokemonMove>, Dictionary<PokemonMove, Move>> MapMoves(IEnumerable<PokemonMove> pokemonMoves, IEnumerable<Move> moves)
+    {
+        Dictionary<Move, PokemonMove> moveMappings = moves.Zip(pokemonMoves, (key, val) => new { key, val }).ToDictionary(kvp => kvp.key, kvp => kvp.val);
+        Dictionary<PokemonMove, Move> pokemonMoveMappings = pokemonMoves.Zip(moves, (key, val) => new { key, val }).ToDictionary(kvp => kvp.key, kvp => kvp.val);
+        return (moveMappings, pokemonMoveMappings);
+    }
+
+    private async Task<IEnumerable<Move>> GetMoves(List<PokemonMove> pokemonMoves)
+    {
+        List<Move> moves = new();
+        foreach (var pokemonMove in pokemonMoves)
+        {
+            moves.Add(await pokeService.GetMove(pokemonMove.Move.Name));
+        }
+        return moves;
+    }
+
+
+   }

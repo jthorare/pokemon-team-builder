@@ -1,12 +1,20 @@
 @using PokemonTeamBuilder.Services
 @inject PokeApiService pokeService
 
-    <RadzenImage Path=@ImgSrc />
+<RadzenImage Path=@ImgSrc />
 @code {
-    private int pokedexId = 0;
-
+    private int natDexId = 0;
     [Parameter, EditorRequired]
-    public int NatDexId { get; set; }
+    public int NatDexId
+    {
+        get { return natDexId; }
+        set
+        {
+            Console.WriteLine($"old {natDexId.ToString()} new {value.ToString()}");
+            natDexId = value; 
+            SetImgSrc(); // update the img path
+        }
+    }
 
     private string? ImgSrc { get; set; }
 
@@ -19,8 +27,6 @@
     private void SetImgSrc()
     {
         ImgSrc = $"pokemon/{NatDexId}.png";
-        //var pokemon = await pokeService.GetPokemon(NatDexId.ToString());
-        //ImgSrc = pokemon.Sprites.FrontDefault;
         StateHasChanged();
     }
 

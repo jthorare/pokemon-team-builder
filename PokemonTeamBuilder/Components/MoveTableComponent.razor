@@ -1,0 +1,71 @@
+﻿<h3>@Title</h3>
+<RadzenDataGrid Data=@Moves TItem="Move" AllowSorting="false" ColumnWidth="min-content">
+    <Columns>
+        <RadzenDataGridColumn TItem="Move" Title="Level" Sortable="false">
+            <Template Context="move">
+                <Span>@GetLevelLearned(move)</Span>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Property="Move.Name" Title="Name" Sortable="false"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Property="Move.Type.Name" Title="Type" Sortable="false"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Property="Move.DamageClass.Name" Title="Damage Class" Sortable="false"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Title="Power" Sortable="false">
+            <Template Context="move">
+                <Span>@ValueOrDefault(move.Power)</Span>
+            </Template>
+
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Title="Accuracy" Sortable="false">
+            <Template Context="move">
+                <Span>@ValueOrDefault(move.Accuracy)</Span>
+            </Template>
+
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Property="Move.Pp" Title="PP" Sortable="false"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Title="Effect Odds" Sortable="false">
+            <Template Context="move">
+                <Span>@ValueOrDefault(move.EffectChance)</Span>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Move" Title="Description">
+            <Template Context="move">
+                <Span>@GetMoveEffectEntry(move)</Span>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+    [Parameter, EditorRequired]
+    public IEnumerable<Move> Moves { get; set; } = new List<Move>();
+    [Parameter, EditorRequired]
+    public Dictionary<Move, PokemonMove> MoveMappings { get; set; } = new();
+
+    private string ValueOrDefault(object? val)
+    {
+        if (val is null)
+        {
+            return "-";
+        }
+        return val.ToString();
+    }
+    private string GetMoveEffectEntry(Move move)
+    {
+        string effectEntry = move.EffectEntries.Where(entry => entry.Language.Name == PokeApiConstants.English).First().ShortEffect;
+        return effectEntry.Replace("$effect_chance", move.EffectChance.ToString());
+    }
+    private string GetLevelLearned(Move move)
+    {
+        int lvlLearned = 0;
+        var details = MoveMappings[move].VersionGroupDetails.LastOrDefault();
+        if (details is not null) { lvlLearned = details.LevelLearnedAt; }
+        if (lvlLearned <= 1)
+        {
+            return "-";
+        }
+        return lvlLearned.ToString();
+    }
+
+}

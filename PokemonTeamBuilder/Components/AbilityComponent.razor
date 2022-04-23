@@ -1,0 +1,29 @@
+﻿@inject PokeApiService pokeService
+@if (Ability is not null)
+{
+    <Span>
+    @if(IsHidden)
+    {
+        <b>@Ability.Name (Hidden)</b>
+        
+    } else
+    {
+        <b>@(Ability.Name)</b>
+    }
+
+    <Span>: @Ability.EffectEntries.Where(entry => entry.Language.Name == PokeApiConstants.English).First().ShortEffect</Span>
+    </Span>
+    <br />
+}
+@code {
+    [Parameter, EditorRequired]
+    public string Url { get; set; }
+    [Parameter, EditorRequired]
+    public bool IsHidden { get; set; }
+    private Ability? Ability { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ability = await pokeService.GetAbility(PokemonUtilities.GetResourceFromUrl(Url));
+    }
+}

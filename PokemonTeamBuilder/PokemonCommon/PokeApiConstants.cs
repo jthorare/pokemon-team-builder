@@ -34,6 +34,14 @@ public static class PokeApiConstants
         { "unknown", 18 },
         { "shadow", 19 }
     };
+
+    public static readonly string English = "en";
+    public readonly struct MoveLearnMethod
+    {
+        public const string Tutor = "tutor";
+        public const string Machine = "machine";
+        public const string LvlUp = "level-up";
+    }
 }
 
 
