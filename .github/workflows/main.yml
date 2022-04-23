@@ -36,7 +36,7 @@ jobs:
         run: cd ./PokemonTeamBuilder
       
       - name: Publish with dotnet
-        run: dotnet publish -c Release -o release
+        run: dotnet publish -c Release -o release ./PokemonTeamBuilder/PokemonTeamBuilder.csproj
         
       - name: Deploy to Github Pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
