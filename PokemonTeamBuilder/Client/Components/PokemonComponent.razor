@@ -1,9 +1,7 @@
 @using PokemonTeamBuilder.Client.Services
 @inject PokeApiService pokeService
 
-<Figure>
-    <FigureImage Source=@ImgSrc />
-</Figure>
+    <RadzenImage Path=@ImgSrc />
 @code {
     private int pokedexId = 0;
 
@@ -18,7 +16,7 @@
         return base.OnInitializedAsync();
     }
 
-    private async void SetImgSrc()
+    private void SetImgSrc()
     {
         ImgSrc = $"pokemon/{NatDexId}.png";
         //var pokemon = await pokeService.GetPokemon(NatDexId.ToString());

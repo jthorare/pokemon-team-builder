@@ -17,7 +17,7 @@
 
         <Div>
 
-            <Div>
+            <Div Class="d-flex justify-content-between">
                 @foreach (int selectedNatDexId in SelectedTeam)
                 {
                     <Button Clicked=@(() => RemoveFromTeam(selectedNatDexId))>
@@ -26,14 +26,20 @@
                 }
             </Div>
 
-            <Div>
-                @foreach (PokemonEntry pokemon in PokemonInDex)
-                {
-                    <Button Clicked=@(() => AddToTeam(PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)))>
-                        <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
-                    </Button>
-                }
-            </Div>
+            <RadzenDataGrid Data=@PokemonInDex TItem="PokemonEntry" FilterMode="FilterMode.Simple" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
+                        RowSelect=@((args) => AddToTeam(args))>
+                <Columns>
+                    <RadzenDataGridColumn TItem="PokemonEntry" Property="EntryNumber"
+                                      Sortable="true" Filterable="true" Title="ID" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PokemonEntry" Property="PokemonSpecies.Name"
+                                      Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
+                        <Template Context="pokemon">
+                            <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
         </Div>
     </Div>
 }
@@ -97,15 +103,14 @@
     /// Adds the given Pokemon from the team.
     /// </summary>
     /// <param name="natDexId">Pokemon's NatDexId to add to the team.</param>
-    private void AddToTeam(int natDexId)
+    private void AddToTeam(PokemonEntry pokemon)
     {
-        // TODO this needs to get the idx of the id, not the id itself
+        int natDexId = PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url);
         Console.WriteLine($"natidx {natDexId}");
         int idxToReplace = SelectedTeam.IndexOf(0);
         if (idxToReplace < 0) { idxToReplace = SelectedTeam.Count - 1; } // IndexOf returns -1 if not found
         Console.WriteLine(idxToReplace);
         SelectedTeam[idxToReplace] = natDexId;
-        // Updating SelectedTeam is not working
         StateHasChanged();
     }
 
@@ -115,7 +120,6 @@
     /// <param name="natDexId">Pokemon's NatDexId to remove from the team.</param>
     private void RemoveFromTeam(int natDexId)
     {
-        // TODO this needs to get the idx of the id, not the id itself
         int idxToReplace = SelectedTeam.IndexOf(natDexId);
         Console.WriteLine($"natidx {natDexId}");
         Console.WriteLine(idxToReplace);

@@ -4,52 +4,52 @@
 
 <h3>Pokedex</h3>
 
-<Div>
-    <Blazorise.Components.Autocomplete Class="mb-2" TItem="PokemonEntry" TValue="PokemonEntry" Data="@PokemonInDex"
-                                       TextField="@((item) => item.PokemonSpecies.Name)" ValueField="@((item) => item)" Placeholder="Search ..."
-                                       Filter="Blazorise.Components.AutocompleteFilter.StartsWith"
-                                       SearchChanged=@SearchForMatchingPokemon>
-        <NotFoundContent> Sorry ... @context was not found.</NotFoundContent>
-    </Blazorise.Components.Autocomplete>
-
-    <Div>
-        <Div Class="float-start">
-            <Div Class="float-end">
-                <Div>
-                    <Label Class="top-50">Type 2: </Label>
-                </Div>
-                <RadzenDropDown TValue="string" Data=@Types2 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, true)) />
+<Div Class="float-start">
+    <Div Class="float-start">
+        <Div Class="float-end">
+            <Div>
+                <Label Class="top-50">Type 2: </Label>
             </Div>
-            <Div Class="float-end">
-                <Div>
-                    <Label Class="top-50">Type 1: </Label>
-                </Div>
-                <RadzenDropDown TValue="string" Data=@Types1 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type1 Change=@(async (args) => await TypeFilterChanged(args, false)) />
+            <RadzenDropDown TValue="string" Data=@Types2 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" 
+            SelectedItemsText=@Type2 Change=@(async (args) => await TypeFilterChanged(args, true)) />
+        </Div>
+        <Div Class="float-end">
+            <Div>
+                <Label Class="top-50">Type 1: </Label>
             </Div>
+            <RadzenDropDown TValue="string" Data=@Types1 Placeholder="Choose a type" AllowClear="true" AllowFiltering="true" SelectedItemsText=@Type1 Change=@(async (args) => await TypeFilterChanged(args, false)) />
         </Div>
     </Div>
 </Div>
-
-<Div>
-    <Div Class="top-100 mt-3">
-        @foreach (PokemonEntry pokemon in PokemonInDex)
-        {
-            <Button Clicked=@(() => NavigateToPokemon(pokemon))>
-                <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
-            </Button>
-        }
-    </Div>
+<Div Class="float-end">
+    <RadzenDataGrid @ref="grid" Data=@PokemonInDex TItem="PokemonEntry" FilterMode="FilterMode.Simple" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
+    RowSelect=@NavigateToPokemon Count=@count> 
+        <Columns>
+            <RadzenDataGridColumn TItem="PokemonEntry" Property="EntryNumber"
+                                  Sortable="true" Filterable="true" Title="ID" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="PokemonEntry" Property="PokemonSpecies.Name"
+                                  Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
+                <Template Context="pokemon">
+                        <PokemonComponent NatDexId=@PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url) />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
 </Div>
 
 @code {
+    RadzenDataGrid<PokemonEntry> grid;
+
     private string Type1 { get; set; } = "";
     private string Type2 { get; set; } = "";
     private IEnumerable<string> Types { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
     private IEnumerable<string> Types1 { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
     private IEnumerable<string> Types2 { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
 
-    List<PokemonEntry> PokemonInDex { get; set; } = new();
-    List<PokemonEntry> NationalDex { get; set; } = new();
+    IEnumerable<PokemonEntry> PokemonInDex { get; set; }
+    IEnumerable<PokemonEntry> NationalDex { get; set; }
+    private int count = 0;
 
     /// <summary>
     /// Populates the displayed dex and the cached NationalDex.
@@ -58,8 +58,8 @@
     protected override async Task OnInitializedAsync()
     {
         Pokedex pokedex = await pokeService.GetPokedex("national");
-        PokemonInDex.AddRange(pokedex.PokemonEntries);
-        NationalDex = pokedex.PokemonEntries;
+        PokemonInDex = pokedex.PokemonEntries.ToList();
+        NationalDex = pokedex.PokemonEntries.ToList();
     }
 
     /// <summary>
@@ -70,7 +70,6 @@
     {
         UriHelper.NavigateTo($"pokemon?pokemon={PokemonUtilities.GetNatDexId(pokemon.PokemonSpecies.Url)}");
     }
-
 
     /// <summary>
     /// Searches for all pokemon whose names start with the given string.
@@ -110,6 +109,9 @@
     /// <returns>Task for async purposes.</returns>
     private async Task TypeFilterChanged(object args, bool two)
     {
+        PokemonInDex = new List<PokemonEntry>();
+        StateHasChanged();
+        count = 0;
         if (args is not null)
         {
             string type = (string)args;
@@ -122,9 +124,11 @@
 
         //  get the Type that isn't null, refilter
         PokemonInDex = await FilterDex();
+        count = PokemonInDex.Count();
         Types1 = Types.Where(type => type != Type2);
         Types2 = Types.Where(type => type != Type1);
-
+        grid.Reset();
+        await grid.Reload();
         StateHasChanged();
     }
 
