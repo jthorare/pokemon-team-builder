@@ -28,10 +28,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v2.0.0
-        with:
-          # Optional SDK version(s) to use. If not provided, will install global.json version when available. Examples: 2.2.104, 3.1, 3.1.x
-          dotnet-version: 6
-          # Optional package source for which to set up authentication. Will consult any existing NuGet.config in the root of the repo and provide a temporary NuGet.config using the NUGET_AUTH_TOKEN environment variable as a ClearTextPassword
+        
       - name: Install WASM Tools
         run: dotnet workload install wasm-tools
         
