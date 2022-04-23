@@ -1,7 +1,7 @@
 @using PokemonTeamBuilder.Services
 @inject PokeApiService pokeService
 
-<RadzenImage Path=@ImgSrc />
+<RadzenImage Path=@ImgSrc Style="width:max-content"/>
 @code {
     private int natDexId = 0;
     [Parameter, EditorRequired]
