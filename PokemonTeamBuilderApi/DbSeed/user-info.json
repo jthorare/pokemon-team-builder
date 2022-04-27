@@ -1,0 +1,14 @@
+[
+  {
+    "username": "jthorare",
+    "password": "password123",
+    "user_id": 1,
+    "is_contr": true
+  },
+  {
+    "username": "jollyhobo",
+    "password": "password12345",
+    "user_id": 2,
+    "is_contr": true
+  }
+]

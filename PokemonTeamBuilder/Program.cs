@@ -5,12 +5,20 @@ using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using PokemonTeamBuilder.Services;
 using PokemonTeamBuilder;
+using System.Net.Http;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddHttpClient("PokemonTeamBuilderApi", (sp, cl) =>
+{
+    cl.BaseAddress = new Uri("https://localhost:7095/api/");
+});
+
+builder.Services.AddScoped(
+    sp => sp.GetService<IHttpClientFactory>().CreateClient("PokemonTeamBuilderApi"));
+builder.Services.AddScoped<IApiService, PokemonTeamBuilderApiService>();
 builder.Services
     .AddBlazorise(options =>
     {
@@ -18,20 +26,20 @@ builder.Services
     })
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
                       policy =>
                       {
-                          policy.WithOrigins("https://pokeapi.co/api/v2");
+                          policy.WithOrigins("https://localhost:7095",
+                              "https://pokeapi.co/api/v2",
+                              "https://login.microsoftonline.com/.well-known/openid-configuration")
+                          .AllowAnyHeader().AllowAnyMethod();
                       });
-}); builder.Services.AddSingleton<PokeApiService>();
-builder.Services.AddOidcAuthentication(options =>
-{
-    // Configure your authentication provider options here.
-    // For more information, see https://aka.ms/blazor-standalone-auth
-    builder.Configuration.Bind("Local", options.ProviderOptions);
 });
 
+builder.Services.AddSingleton<PokeApiService>();
+builder.Services.AddSingleton<AppData>();
 
 await builder.Build().RunAsync();

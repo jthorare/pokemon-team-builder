@@ -39,7 +39,7 @@
 </Div>
 
 @code {
-    RadzenDataGrid<PokemonEntry> grid;
+    RadzenDataGrid<PokemonEntry>? grid;
 
     private string Type1 { get; set; } = "";
     private string Type2 { get; set; } = "";
@@ -47,8 +47,8 @@
     private IEnumerable<string> Types1 { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
     private IEnumerable<string> Types2 { get; set; } = PokeApiConstants.TypeMappings.Keys.ToList();
 
-    IEnumerable<PokemonEntry> PokemonInDex { get; set; }
-    IEnumerable<PokemonEntry> NationalDex { get; set; }
+    IEnumerable<PokemonEntry>? PokemonInDex { get; set; }
+    IEnumerable<PokemonEntry>? NationalDex { get; set; }
     private int count = 0;
 
     /// <summary>

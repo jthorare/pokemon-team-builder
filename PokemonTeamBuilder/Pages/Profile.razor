@@ -1,0 +1,180 @@
+﻿@page "/profile"
+@using PokemonTeamBuilderApi.Models
+@using System.Text.Json
+@inject IApiService apiService
+@inject AppData appData
+
+<h3>Profile</h3>
+@if (LoggedIn)
+{
+    <Div>
+        <Div Class="float-start">
+            <Div>Trainer: @userInfo.Username</Div>
+            <Div>Is Contributor: @appData.IsContributor.ToString()</Div>
+            @if (UserTeams is not null)
+            {
+                foreach (var kvp in UserTeams)
+                {
+                    <Div>
+                        <Span>Region @kvp.Key.Split('-')[kvp.Key.Split('-').Count() - 1].ToUpper()</Span>
+                        @foreach (var team in kvp.Value)
+                        {
+                            <Div>
+                                @foreach (var natDexId in team)
+                                {
+                                    <PokemonComponent NatDexId=@natDexId />
+                                }
+                            </Div>
+                        }
+                    </Div>
+                }
+            }
+        </Div>
+        <RadzenButton ButtonType=Radzen.ButtonType.Button Click=@(() => Logout())>Logout</RadzenButton>
+    </Div>
+}
+else
+{
+    <RadzenTemplateForm Data="@userInfo" hidden=@(Registering) TItem="UserInfo" Submit=@((UserInfo args) => Login(args))>
+        <div class="row">
+            <div class="col-md-6">
+                <RadzenFieldset Text="Login">
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Username" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenTextBox style="width: 100%;" Name="Username" @bind-Value="userInfo.Username" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Password" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenPassword style="width: 100%;" Name="Password" @bind-Value="userInfo.Password" />
+                        </div>
+                    </div>
+                </RadzenFieldset>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Login" IsBusy=@busy />
+            </div>
+        </div>
+    </RadzenTemplateForm>
+
+
+
+    <RadzenTemplateForm hidden=@(!Registering) Data="@userInfo" TItem="UserInfo" Submit=@((UserInfo args) => Register(args))>
+        <div class="row">
+            <div class="col-md-6">
+                <RadzenFieldset Text="Create Profile">
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Set username" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenTextBox style="width: 100%;" Name="Username" @bind-Value="userInfo.Username" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Set password" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenPassword style="width: 100%;" Name="Password" @bind-Value="userInfo.Password" />
+                        </div>
+                    </div>
+                </RadzenFieldset>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Register" IsBusy=@busy />
+            </div>
+        </div>
+    </RadzenTemplateForm>
+
+    <RadzenButton class="float-end" ButtonType=Radzen.ButtonType.Submit Click=@(() => {Registering = !Registering; StateHasChanged();})>
+        @if (Registering)
+        {
+            <span>Login</span>
+        }
+        else
+        {
+            <span>Create a Profile</span>
+        }
+    </RadzenButton>
+}
+
+@code {
+    // THIS PAGE NEEDS TO BE DELETED AFTER THE PROJECT BECAUSE IT DOESN'T PROTECT THE USER INFO
+    private bool busy = false;
+    private bool LoggedIn { get; set; } = false;
+    private bool Registering { get; set; } = false;
+    private string login_register { get { return Registering ? "register" : "login"; } }
+
+    private UserInfo userInfo = new();
+    private Dictionary<string, List<List<int>>>? UserTeams { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoggedIn = appData.UserId is not null;
+    }
+
+    private void Logout()
+    {
+        appData.UserId = null;
+        appData.TeamMappings = null;
+        appData.IsContributor = null;
+    }
+    private async Task Login(UserInfo userInfo)
+    {
+        if (userInfo.Username is not null && userInfo.Password is not null)
+        {
+            if (userInfo.Username.Length > 0 && userInfo.Password.Length > 0)
+            {
+                var response = await apiService.Login(userInfo);
+                if (response.IsSuccessStatusCode)
+                {
+                    var teamsAsJson = await response.Content.ReadAsStringAsync();
+                    var responseBody = JsonSerializer.Deserialize<List<object>>(teamsAsJson);
+                    var userTeams = JsonSerializer.Deserialize<UserTeams>(JsonSerializer.Serialize(responseBody[1]));
+                    UserTeams = userTeams.TeamMappings;
+                    LoggedIn = true;
+                    appData.UserId = userTeams.UserId;
+                    appData.TeamMappings = UserTeams;
+                    var isContr = responseBody[0];
+                    appData.IsContributor = JsonSerializer.Deserialize<bool>(JsonSerializer.Serialize(responseBody[0]));
+                    StateHasChanged();
+                    return;
+                }
+                // error code, show dialog
+            }
+        }
+    }
+
+    private async Task Register(UserInfo userInfo)
+    {
+        if (userInfo.Username is not null && userInfo.Password is not null)
+        {
+            if (userInfo.Username.Length > 0 && userInfo.Password.Length > 0)
+            {
+                var response = await apiService.Register(userInfo);
+                if (response.IsSuccessStatusCode)
+                {
+                    var id = await response.Content.ReadAsStringAsync();
+                    Registering = false;
+                    LoggedIn = true;
+                    appData.UserId = Int32.Parse(id);
+                    StateHasChanged();
+                    return;
+                }
+                // error code, show dialog that username is taken
+            }
+        }
+    }
+
+}

@@ -1,0 +1,29 @@
+﻿@page "/move"
+@inject NavigationManager NavManager
+@inject PokeApiService pokeService
+
+<h3>MoveEntry</h3>
+
+@code {
+    public Move Move { get; set; }
+    public string? MoveName { get; set; }
+
+    /// <summary>
+    /// Sets the name and makes the api call to get the given Pokemon's info.
+    /// </summary>
+    /// <returns>Asynchronous load of a task.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("move", out var _name))
+        {
+            MoveName = _name;
+        }
+        if (MoveName is not null)
+        {
+            Move = await pokeService.GetMove(MoveName);
+            
+        }
+
+    }
+}

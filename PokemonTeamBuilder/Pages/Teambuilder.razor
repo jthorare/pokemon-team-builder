@@ -1,5 +1,9 @@
 @page "/teambuilder"
+@using System.Security.Claims
 @inject PokeApiService pokeService
+@inject IApiService apiService
+@inject AppData appData
+
 <h3>Teambuilder</h3>
 
 @if (PokemonInDex.Count > 0 && Loaded)
@@ -9,14 +13,15 @@
             <Button Color="Color.Primary" Clicked=@(() => PokemonInDex.Clear())>
                 Back
             </Button>
-
-            <Button Color="Color.Secondary" Clicked=@(() => SaveTeam())>
-                Save to Profile
-            </Button>
+            @if (appData.UserId is not null)
+            {
+                <Button Color="Color.Secondary" Clicked=@(async () => await SaveTeam(SelectedTeam))>
+                    Save to Profile
+                </Button>
+            }
         </Div>
 
         <Div>
-
             <Div Class="d-flex justify-content-between">
                 @foreach (int selectedNatDexId in SelectedTeam)
                 {
@@ -35,7 +40,7 @@
                                       Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
                     <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
                         <Template Context="pokemon">
-                            <PokemonComponent NatDexId=@Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.PokemonSpecies.Url))/>
+                            <PokemonComponent NatDexId=@Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.PokemonSpecies.Url)) />
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -82,10 +87,10 @@
         </Figure>
     </Button>
 }
-
-
 @code {
     bool Loaded = true;
+
+    private string Region = "";
 
     List<PokemonEntry> PokemonInDex { get; set; } = new List<PokemonEntry>();
 
@@ -94,9 +99,12 @@
     /// <summary>
     /// Saves the team to the given user's profile.
     /// </summary>
-    private void SaveTeam()
+    private async Task SaveTeam(List<int> team)
     {
-        // need to inject service and call a save to the backend api
+        if (appData.UserId is not null)
+        {
+            await apiService.SaveTeamAsync(appData.UserId, new Dictionary<string, List<List<int>>>() { { Region, new List<List<int>>() { team } } });
+        }
     }
 
     /// <summary>
@@ -151,8 +159,9 @@
     /// <returns>Awaits the population of the Pokedex.</returns>
     private async Task GetPokedex(string region)
     {
+        Region = region;
         Loaded = false;
         List<int> dexes = PokeApiConstants.RegionMappings[region];
         await PopulateDex(dexes);
     }
-}
+    }

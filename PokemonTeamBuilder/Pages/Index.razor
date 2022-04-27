@@ -1,5 +1,6 @@
 ﻿@page "/"
-
+@inject AppData appData
+@inject IApiService apiService
 <PageTitle>Index</PageTitle>
 <h3>Home</h3>
 
@@ -11,7 +12,27 @@
         Pokemon of the day!
         <PokemonComponent NatDexId=@rand.Next(1,898) />
     </Div>
+    <br />
+    @if (appData.IsContributor is not null && (bool)appData.IsContributor)
+    {
+        <RadzenTemplateForm Data=@Suggestion TItem="string" Submit=@((string args) => SubmitSuggestion(args))>
+            <Label>Any suggestions to improve the website?</Label>
+            <RadzenTextBox @bind-Value="Suggestion"></RadzenTextBox>
+            <div class="row justify-content-center">
+                <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                    <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Submit Suggestion" />
+                </div>
+            </div>
+        </RadzenTemplateForm>
+    }
 </Div>
 @code {
+    private string? Suggestion { get; set; }
     private Random rand = new Random(DateTime.Today.DayOfYear);
+
+    private async Task SubmitSuggestion(string suggestion)
+    {
+        await apiService.SubmitSuggestion(suggestion);
+        Suggestion = null;
+    }
 }

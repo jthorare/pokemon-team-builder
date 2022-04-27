@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32002.185
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokemonTeamBuilder", "PokemonTeamBuilder.csproj", "{1F0D6C2C-D262-4514-BD43-F280F28ABE5F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokemonTeamBuilderApi", "..\PokemonTeamBuilderApi\PokemonTeamBuilderApi.csproj", "{9CD480F2-EE56-4EBF-9B9D-4066BED63821}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1F0D6C2C-D262-4514-BD43-F280F28ABE5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F0D6C2C-D262-4514-BD43-F280F28ABE5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F0D6C2C-D262-4514-BD43-F280F28ABE5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CD480F2-EE56-4EBF-9B9D-4066BED63821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CD480F2-EE56-4EBF-9B9D-4066BED63821}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CD480F2-EE56-4EBF-9B9D-4066BED63821}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CD480F2-EE56-4EBF-9B9D-4066BED63821}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
