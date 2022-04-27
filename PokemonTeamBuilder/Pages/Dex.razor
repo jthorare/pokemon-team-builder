@@ -31,7 +31,7 @@
                                   Sortable="true" Filterable="true" FilterOperator="FilterOperator.Contains" Title="Name" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="PokemonEntry" Title="Pokemon" Sortable="false" Filterable="false">
                 <Template Context="pokemon">
-                    <PokemonComponent NatDexId=@pokemon.EntryNumber />
+                    <PokemonComponent NatDexId=@Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.PokemonSpecies.Url)) />
                 </Template>
             </RadzenDataGridColumn>
         </Columns>

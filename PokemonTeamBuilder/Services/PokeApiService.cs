@@ -40,9 +40,9 @@ public class PokeApiService
         return await Poke.GetNamedResourcePageAsync<PokeApiNet.Type>();
     }
 
-    public async Task<Ability> GetAbility(string ability)
+    public async Task<Ability> GetAbility(int id)
     {
-        return await Poke.GetResourceAsync<Ability>(ability);
+        return await Poke.GetResourceAsync<Ability>(id);
     }
 
     public async Task<Move> GetMove(string move)

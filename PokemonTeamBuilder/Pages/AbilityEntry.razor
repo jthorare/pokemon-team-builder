@@ -1,0 +1,39 @@
+﻿@page "/ability"
+@inject NavigationManager NavManager
+@inject PokeApiService pokeService
+
+<AbilityComponent Id=@(ability.Id) IsHidden=false />
+<h3>Pokemon that learn: @ability.Name</h3>
+@foreach (AbilityPokemon pokemon in AbilityPokemon)
+{
+    <PokemonComponent NatDexId=@(Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.Pokemon.Url))) />
+}
+@code {
+
+    public int? Id { get; set; }
+    public Ability? ability { get; set; }
+    List<AbilityPokemon>? AbilityPokemon { get; set; }
+
+    /// <summary>
+    /// Sets the name and makes the api call to get the given Ability's info.
+    /// </summary>
+    /// <returns>Asynchronous load of a task.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("ability", out var _idAsString))
+        {
+            if (Int32.TryParse(_idAsString, out var _id))
+            {
+                Id = _id;
+                ability = await pokeService.GetAbility((int)Id);
+                AbilityPokemon = ability.Pokemon.Where(pokemon =>
+                {
+                    int natDexId = Int32.Parse(PokemonUtilities.GetResourceFromUrl(pokemon.Pokemon.Url));
+                    return 1 <= natDexId && 899 > natDexId;
+                }).ToList();
+            }
+        }
+    }
+
+}

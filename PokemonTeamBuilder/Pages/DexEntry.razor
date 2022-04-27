@@ -14,11 +14,13 @@
             <Div>
                 @foreach (var ability in Pokemon.Abilities)
                 {
-                    <AbilityComponent Url=@ability.Ability.Url IsHidden=@ability.IsHidden></AbilityComponent>
+                    <Button Clicked="(() => NavigateToAbility(ability))">
+                        <AbilityComponent Id=@Int32.Parse(PokemonUtilities.GetResourceFromUrl(ability.Ability.Url)) IsHidden=@ability.IsHidden></AbilityComponent>
+                    </Button>
                 }
             </Div>
         </Div>
-        <PokemonMovesComponent Pokemon=@Pokemon/>  
+        <PokemonMovesComponent Pokemon=@Pokemon />
     </Div>
 }
 
@@ -43,6 +45,14 @@
             Pokemon = await pokeService.GetPokemon(PokemonName);
             NatDexId = Pokemon.Id;
         }
-
     }
+    /// <summary>
+    /// Navigates to the page for the selected ability.
+    /// </summary>
+    /// <param name="ability">The ability we want to see the page for.</param>
+    private void NavigateToAbility(PokemonAbility ability)
+    {
+        NavManager.NavigateTo($"ability?ability={PokemonUtilities.GetResourceFromUrl(ability.Ability.Url)}");
+    }
+
 }
