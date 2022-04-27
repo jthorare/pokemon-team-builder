@@ -21,3 +21,10 @@
 1. Anonymous user with access to all pages
 2. Registered user with access to all pages and the ability to save teams to the database.
 3. Contributor user with the ability to suggest improvements on the homepage to save to the database.
+
+#### 3rd-Party API
+<p
+   I access https://pokeapi.co/api/v2/ as my 3rd-Party API. This api provides numerous GET request endpoints that reply in JSON. There exists a wrapper
+   library PokeApiNet that I utilize to retrieve data from the API depending on the page. I created a Service that wraps the wrapper library in order to
+   maintain the singleton pattern from the library's specification.
+  </p>
