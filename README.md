@@ -6,9 +6,9 @@
   </p>
   
 #### Tech Stack
-2. ASP.NET Web API
-3. Blazor Webassembly client using Blazorise and Radzen UI frameworks
-4. MongoDB
+1. ASP.NET Web API
+2. Blazor Webassembly client using Blazorise and Radzen UI frameworks
+3. MongoDB
 
 <p>
   I decided to create my SPA using C# and use a relatively new technology, Webassembly applications. I created a Blazor Webassembly application with the intention of
